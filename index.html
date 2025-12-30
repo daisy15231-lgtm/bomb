@@ -7,29 +7,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
         body {
             margin: 0;
             padding: 0;
             background-color: #000;
-            color: #FFE81F; /* 經典星戰黃 */
+            color: #FFE81F;
             font-family: 'Noto Sans TC', sans-serif;
             overflow: hidden;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        /* 初始啟動層：解決瀏覽器自動播放限制 */
+        /* --- 通用元件 --- */
+        .hidden { display: none !important; }
+
+        /* --- 初始啟動層 --- */
         #interaction-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: 9999;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -38,52 +36,46 @@
             transition: opacity 1s ease;
         }
 
-        .pulse {
-            animation: pulse-animation 2s infinite;
-        }
-
+        .pulse { animation: pulse-animation 2s infinite; }
         @keyframes pulse-animation {
-            0% { transform: scale(1); opacity: 0.8; }
+            0%, 100% { transform: scale(1); opacity: 0.8; }
             50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
         }
 
-        /* 星空背景 */
-        .stars {
+        /* --- 星空背景 --- */
+        .stars-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: -1;
             background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
         }
-
         .star {
             position: absolute;
             background: white;
             border-radius: 50%;
-            opacity: 0.5;
             animation: twinkle var(--duration) infinite;
         }
-
         @keyframes twinkle {
             0%, 100% { opacity: 0.3; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* 很久以前... */
+        /* --- 字幕動畫區 --- */
+        #intro-scene {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .intro-text {
             position: absolute;
-            color: #4BD5EE; /* 經典星戰藍 */
+            color: #4BD5EE;
             font-size: clamp(1.5rem, 5vw, 2.5rem);
             font-weight: 700;
             opacity: 0;
         }
-
-        .intro-animation {
-            animation: introFade 6s ease-out forwards;
-        }
+        .intro-animation { animation: introFade 6s ease-out forwards; }
 
         @keyframes introFade {
             0% { opacity: 0; }
@@ -92,64 +84,27 @@
             100% { opacity: 0; }
         }
 
-        /* 3D 捲動容器 */
         .crawl-container {
-            display: none; /* 初始隱藏，點擊後顯示 */
+            display: none;
             justify-content: center;
             position: relative;
             height: 800px;
-            width: 60%;
-            perspective: 400px; 
+            width: 70%;
+            perspective: 400px;
             text-align: justify;
             overflow: hidden;
         }
-
         .crawl-content {
             position: absolute;
             top: 100%;
             transform-origin: 50% 100%;
             animation: crawl 45s linear forwards;
-            animation-delay: 1s; /* 縮短延遲，音樂開始後較快銜接 */
         }
-
         @keyframes crawl {
-            0% {
-                top: 100%;
-                transform: rotateX(25deg) translateZ(0);
-            }
-            100% {
-                top: -180%;
-                transform: rotateX(25deg) translateZ(-600px);
-            }
+            0% { top: 100%; transform: rotateX(25deg) translateZ(0); }
+            100% { top: -200%; transform: rotateX(25deg) translateZ(-600px); }
         }
 
-        .episode-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 900;
-            margin-bottom: 2rem;
-            letter-spacing: 0.2rem;
-        }
-
-        .main-title {
-            text-align: center;
-            font-size: 4rem;
-            font-weight: 900;
-            margin-bottom: 3rem;
-        }
-
-        .crawl-text {
-            font-size: 1.8rem;
-            line-height: 1.6;
-            font-weight: 700;
-        }
-
-        .highlight {
-            color: #fff;
-            text-shadow: 0 0 10px #FFE81F;
-        }
-
-        /* 動作按鈕 */
         .action-btn {
             position: absolute;
             bottom: 10%;
@@ -162,92 +117,165 @@
             font-size: 1.5rem;
             cursor: pointer;
             transition: all 0.3s;
-            text-transform: uppercase;
             letter-spacing: 0.3rem;
-            z-index: 10;
+            z-index: 100;
             display: none;
         }
-
+        .action-btn:hover {
+            background: #FFE81F;
+            color: #000;
+            box-shadow: 0 0 30px #FFE81F;
+        }
         .btn-animation {
             display: block;
             animation: fadeIn 2s ease-in forwards;
-            animation-delay: 20s; 
+            animation-delay: 20s;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 音樂控制 */
-        .audio-control {
+        /* --- 超空間跳躍特效 --- */
+        #hyperspace {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            color: #4BD5EE;
-            cursor: pointer;
-            font-size: 0.8rem;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 10px;
-            border-radius: 4px;
+            inset: 0;
+            z-index: 500;
+            background: #000;
             display: none;
+            overflow: hidden;
+        }
+        .warp-line {
+            position: absolute;
+            background: #fff;
+            width: 2px;
+            height: 20px;
+            opacity: 0.5;
+        }
+
+        /* --- 任務介面 (下一頁) --- */
+        #mission-scene {
+            display: none;
+            height: 100vh;
+            background: #050505;
+            color: #00ff00; /* 雷達綠 */
+            font-family: 'Share Tech Mono', monospace;
+            padding: 2rem;
+            flex-direction: column;
+        }
+        .panel {
+            border: 2px solid #00ff00;
+            padding: 1rem;
+            background: rgba(0, 255, 0, 0.05);
+            box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+        .scanner-line {
+            height: 2px;
+            background: rgba(0, 255, 0, 0.5);
+            width: 100%;
+            position: relative;
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 點擊層以啟動音樂與動畫 -->
+    <!-- 1. 初始啟動層 -->
     <div id="interaction-overlay" onclick="initExperience()">
-        <h2 class="text-3xl font-bold mb-4">傳輸中...</h2>
-        <p class="pulse text-xl text-blue-400">點擊螢幕接收星際簡報</p>
+        <div class="text-center">
+            <h2 class="text-4xl font-black mb-6 tracking-widest text-white">SYSTEM READY</h2>
+            <p class="pulse text-xl text-blue-400 font-bold">點擊螢幕接收星際簡報</p>
+        </div>
     </div>
 
-    <div class="stars" id="star-field"></div>
+    <!-- 背景星空 -->
+    <div class="stars-container" id="star-field"></div>
 
     <!-- 背景音樂 -->
     <audio id="bgm" loop>
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="intro-text" id="intro">
-        很久以前，在一個遙遠的星系……
-    </div>
+    <!-- 2. 字幕場景 -->
+    <div id="intro-scene">
+        <div class="intro-text" id="intro-line">
+            很久以前，在一個遙遠的星系……
+        </div>
 
-    <div class="crawl-container" id="container">
-        <div class="crawl-content">
-            <div class="episode-title">任務章節：核心爆破</div>
-            <div class="main-title">EPISODE I<br>THE CORE BREACH</div>
-            
-            <div class="crawl-text">
-                <p class="mb-8">銀河內戰正值關鍵時刻。叛軍特遣隊成功潛入了帝國最嚴密的 <span class="highlight">「死星三號」</span> 能源反應爐核心。</p>
+        <div class="crawl-container" id="crawl-box">
+            <div class="crawl-content">
+                <div class="text-center mb-10">
+                    <p class="text-2xl font-bold mb-4">任務章節：核心爆破</p>
+                    <h1 class="text-6xl font-black leading-tight">EPISODE I<br>THE CORE BREACH</h1>
+                </div>
                 
-                <p class="mb-8">為了阻止反抗軍的推進，邪惡的帝國軍在核心控制板上，佈下了密密麻麻的感應式質子炸彈。這些炸彈被連結在一個複雜的數字編碼網絡之中。</p>
-                
-                <p class="mb-8">只要觸動任何一枚，整座太空站將連同受困的反抗軍同胞化為宇宙塵埃。</p>
-                
-                <p class="mb-8">身為首席電子技師，你唯一的武器就是手中的解碼器。你必須在黑暗中摸索，利用殘留的信號脈衝判斷威脅。</p>
-                
-                <p class="text-center italic mt-12">冷靜思考，精準標記。<br>全宇宙的自由，就掌握在你的指尖……</p>
+                <div class="text-3xl font-bold leading-relaxed space-y-8">
+                    <p>銀河內戰正值關鍵時刻。叛軍特遣隊成功潛入了帝國最嚴密的 <span class="text-white shadow-lg">「死星三號」</span> 能源反應爐核心。</p>
+                    <p>為了阻止反抗軍的推進，邪惡的帝國軍在核心控制板上，佈下了密密麻麻的感應式質子炸彈。這些炸彈被連結在一個複雜的數字編碼網絡之中。</p>
+                    <p>只要觸動任何一枚，整座太空站將連同受困的反抗軍同胞化為宇宙塵埃。</p>
+                    <p>身為首席電子技師，你唯一的武器就是手中的解碼器。你必須在黑暗中摸索，利用殘留的信號脈衝判斷威脅。</p>
+                    <p class="text-center italic pt-10 text-white">冷靜思考，精準標記。<br>全宇宙的自由，就掌握在你的指尖……</p>
+                </div>
             </div>
         </div>
+
+        <button class="action-btn" id="startBtn" onclick="triggerWarp()">解碼任務：啟動</button>
     </div>
 
-    <button class="action-btn" id="startBtn" onclick="startMission()">開始解碼</button>
+    <!-- 3. 超空間跳躍特效 -->
+    <div id="hyperspace"></div>
 
-    <div class="audio-control" onclick="toggleAudio()">
-        [ 音訊系統：ON ]
+    <!-- 4. 任務介面 (下一頁內容) -->
+    <div id="mission-scene" class="flex items-center justify-center">
+        <div class="w-full max-w-4xl space-y-6">
+            <div class="flex justify-between items-end border-b-2 border-green-500 pb-2">
+                <h2 class="text-4xl font-bold">CORE DECODER v1.0</h2>
+                <div class="text-right">
+                    <p>LOCATION: DEATH STAR III - CORE</p>
+                    <p id="timestamp">STATUS: CONNECTED</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6 h-96">
+                <div class="col-span-2 panel relative overflow-hidden">
+                    <div class="scanner-line"></div>
+                    <div class="h-full flex items-center justify-center">
+                        <div class="text-center">
+                            <p class="text-6xl mb-4 font-mono animate-pulse">SEARCHING FOR PULSE...</p>
+                            <p class="text-xl">感應式質子炸彈分佈圖加載中...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel space-y-4">
+                    <h3 class="border-b border-green-500 pb-1">任務日誌</h3>
+                    <p class="text-sm opacity-80">>> 偵測到帝國加密頻率</p>
+                    <p class="text-sm opacity-80">>> 正在掃描反應爐核心...</p>
+                    <p class="text-sm text-red-500">>> 警告：偵測到 24 枚質子炸彈</p>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-10">
+                <button class="border-2 border-green-500 px-10 py-4 hover:bg-green-500 hover:text-black transition-colors font-bold text-2xl" onclick="location.reload()">重新掃描</button>
+                <button class="bg-red-900 text-white px-10 py-4 hover:bg-red-600 transition-colors font-bold text-2xl">手動拆除</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const bgm = document.getElementById('bgm');
         const overlay = document.getElementById('interaction-overlay');
-        const intro = document.getElementById('intro');
-        const container = document.getElementById('container');
+        const intro = document.getElementById('intro-line');
+        const crawlBox = document.getElementById('crawl-box');
         const startBtn = document.getElementById('startBtn');
-        const audioCtrl = document.querySelector('.audio-control');
+        const hyperspace = document.getElementById('hyperspace');
+        const introScene = document.getElementById('intro-scene');
+        const missionScene = document.getElementById('mission-scene');
 
-        // 初始化星星
+        // 初始化背景星星
         const starField = document.getElementById('star-field');
         for (let i = 0; i < 200; i++) {
             const star = document.createElement('div');
@@ -258,48 +286,65 @@
             star.style.width = `${size}px`;
             star.style.height = `${size}px`;
             star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
-            star.style.animationDelay = `${Math.random() * 5}s`;
             starField.appendChild(star);
         }
 
+        // 啟動體驗
         function initExperience() {
-            // 播放音樂
-            bgm.play().catch(e => console.log("播放失敗"));
-            
-            // 隱藏疊加層
+            bgm.play().catch(() => {});
             overlay.style.opacity = '0';
             setTimeout(() => overlay.style.display = 'none', 1000);
 
-            // 啟動動畫
             intro.classList.add('intro-animation');
-            audioCtrl.style.display = 'block';
-
-            // 設定字幕出現時間
+            
             setTimeout(() => {
-                container.style.display = 'flex';
+                crawlBox.style.display = 'flex';
                 startBtn.classList.add('btn-animation');
             }, 6000);
         }
 
-        function toggleAudio() {
-            if (bgm.paused) {
-                bgm.play();
-                audioCtrl.innerText = '[ 音訊系統：ON ]';
-            } else {
-                bgm.pause();
-                audioCtrl.innerText = '[ 音訊系統：OFF ]';
+        // 超空間跳躍特效 (下一頁跳轉動畫)
+        function triggerWarp() {
+            startBtn.style.display = 'none';
+            hyperspace.style.display = 'block';
+            
+            // 產生跳躍線條
+            for(let i=0; i<100; i++) {
+                const line = document.createElement('div');
+                line.className = 'warp-line';
+                line.style.left = Math.random() * 100 + 'vw';
+                line.style.top = Math.random() * 100 + 'vh';
+                line.style.transform = `rotate(${Math.random() * 360}deg)`;
+                hyperspace.appendChild(line);
+                
+                line.animate([
+                    { transform: 'scale(0) translate(0, 0)', opacity: 0 },
+                    { transform: `scale(20) translate(${(Math.random()-0.5)*1000}px, ${(Math.random()-0.5)*1000}px)`, opacity: 1 }
+                ], {
+                    duration: 1500,
+                    easing: 'ease-in'
+                });
             }
+
+            // 1.5秒後切換場景
+            setTimeout(() => {
+                introScene.style.display = 'none';
+                hyperspace.style.background = '#fff';
+                setTimeout(() => {
+                    hyperspace.style.opacity = '0';
+                    missionScene.style.display = 'flex';
+                    // 音樂稍微調小聲一點，增加任務氣氛
+                    bgm.volume = 0.4;
+                    setTimeout(() => hyperspace.style.display = 'none', 1000);
+                }, 200);
+            }, 1300);
         }
 
-        function startMission() {
-            startBtn.innerText = "正在進入超空間...";
-            document.body.style.transition = "all 1s";
-            document.body.style.filter = "brightness(5)";
-            setTimeout(() => {
-                alert("任務系統啟動：準備解碼感應式質子炸彈！");
-                location.reload(); 
-            }, 1000);
-        }
+        // 更新任務介面的時間戳
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('timestamp').innerText = `SYSTEM TIME: ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()} [SECURE]`;
+        }, 1000);
     </script>
 </body>
 </html>
