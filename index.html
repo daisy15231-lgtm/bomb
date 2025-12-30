@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
         body {
             margin: 0;
@@ -18,9 +17,6 @@
             overflow: hidden;
             height: 100vh;
         }
-
-        /* --- 通用元件 --- */
-        .hidden { display: none !important; }
 
         /* --- 初始啟動層 --- */
         #interaction-overlay {
@@ -152,34 +148,6 @@
             height: 20px;
             opacity: 0.5;
         }
-
-        /* --- 任務介面 (下一頁) --- */
-        #mission-scene {
-            display: none;
-            height: 100vh;
-            background: #050505;
-            color: #00ff00; /* 雷達綠 */
-            font-family: 'Share Tech Mono', monospace;
-            padding: 2rem;
-            flex-direction: column;
-        }
-        .panel {
-            border: 2px solid #00ff00;
-            padding: 1rem;
-            background: rgba(0, 255, 0, 0.05);
-            box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.2);
-        }
-        .scanner-line {
-            height: 2px;
-            background: rgba(0, 255, 0, 0.5);
-            width: 100%;
-            position: relative;
-            animation: scan 4s linear infinite;
-        }
-        @keyframes scan {
-            0% { top: 0; }
-            100% { top: 100%; }
-        }
     </style>
 </head>
 <body>
@@ -226,44 +194,8 @@
         <button class="action-btn" id="startBtn" onclick="triggerWarp()">解碼任務：啟動</button>
     </div>
 
-    <!-- 3. 超空間跳躍特效 -->
+    <!-- 3. 超空間跳躍特效容器 -->
     <div id="hyperspace"></div>
-
-    <!-- 4. 任務介面 (下一頁內容) -->
-    <div id="mission-scene" class="flex items-center justify-center">
-        <div class="w-full max-w-4xl space-y-6">
-            <div class="flex justify-between items-end border-b-2 border-green-500 pb-2">
-                <h2 class="text-4xl font-bold">CORE DECODER v1.0</h2>
-                <div class="text-right">
-                    <p>LOCATION: DEATH STAR III - CORE</p>
-                    <p id="timestamp">STATUS: CONNECTED</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-6 h-96">
-                <div class="col-span-2 panel relative overflow-hidden">
-                    <div class="scanner-line"></div>
-                    <div class="h-full flex items-center justify-center">
-                        <div class="text-center">
-                            <p class="text-6xl mb-4 font-mono animate-pulse">SEARCHING FOR PULSE...</p>
-                            <p class="text-xl">感應式質子炸彈分佈圖加載中...</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="panel space-y-4">
-                    <h3 class="border-b border-green-500 pb-1">任務日誌</h3>
-                    <p class="text-sm opacity-80">>> 偵測到帝國加密頻率</p>
-                    <p class="text-sm opacity-80">>> 正在掃描反應爐核心...</p>
-                    <p class="text-sm text-red-500">>> 警告：偵測到 24 枚質子炸彈</p>
-                </div>
-            </div>
-
-            <div class="flex justify-center gap-10">
-                <button class="border-2 border-green-500 px-10 py-4 hover:bg-green-500 hover:text-black transition-colors font-bold text-2xl" onclick="location.reload()">重新掃描</button>
-                <button class="bg-red-900 text-white px-10 py-4 hover:bg-red-600 transition-colors font-bold text-2xl">手動拆除</button>
-            </div>
-        </div>
-    </div>
 
     <script>
         const bgm = document.getElementById('bgm');
@@ -272,8 +204,6 @@
         const crawlBox = document.getElementById('crawl-box');
         const startBtn = document.getElementById('startBtn');
         const hyperspace = document.getElementById('hyperspace');
-        const introScene = document.getElementById('intro-scene');
-        const missionScene = document.getElementById('mission-scene');
 
         // 初始化背景星星
         const starField = document.getElementById('star-field');
@@ -303,13 +233,13 @@
             }, 6000);
         }
 
-        // 超空間跳躍特效 (下一頁跳轉動畫)
+        // 超空間跳躍特效並跳轉至下一頁
         function triggerWarp() {
             startBtn.style.display = 'none';
             hyperspace.style.display = 'block';
             
             // 產生跳躍線條
-            for(let i=0; i<100; i++) {
+            for(let i=0; i<120; i++) {
                 const line = document.createElement('div');
                 line.className = 'warp-line';
                 line.style.left = Math.random() * 100 + 'vw';
@@ -319,32 +249,22 @@
                 
                 line.animate([
                     { transform: 'scale(0) translate(0, 0)', opacity: 0 },
-                    { transform: `scale(20) translate(${(Math.random()-0.5)*1000}px, ${(Math.random()-0.5)*1000}px)`, opacity: 1 }
+                    { transform: `scale(25) translate(${(Math.random()-0.5)*1200}px, ${(Math.random()-0.5)*1200}px)`, opacity: 1 }
                 ], {
-                    duration: 1500,
+                    duration: 1200,
                     easing: 'ease-in'
                 });
             }
 
-            // 1.5秒後切換場景
+            // 動畫結束後跳轉到 GitHub 上的下一個檔案
+            // 請確保您的專案目錄下有踩地雷4.0.html 這個檔案
             setTimeout(() => {
-                introScene.style.display = 'none';
                 hyperspace.style.background = '#fff';
                 setTimeout(() => {
-                    hyperspace.style.opacity = '0';
-                    missionScene.style.display = 'flex';
-                    // 音樂稍微調小聲一點，增加任務氣氛
-                    bgm.volume = 0.4;
-                    setTimeout(() => hyperspace.style.display = 'none', 1000);
-                }, 200);
-            }, 1300);
+                    window.location.href = '踩地雷4.0.html'; 
+                }, 100);
+            }, 1100);
         }
-
-        // 更新任務介面的時間戳
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('timestamp').innerText = `SYSTEM TIME: ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()} [SECURE]`;
-        }, 1000);
     </script>
 </body>
 </html>
